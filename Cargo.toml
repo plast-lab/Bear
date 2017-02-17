@@ -1,0 +1,6 @@
+[package]
+name = "bear"
+version = "3.0.0"
+authors = ["Laszlo Nagy <rizsotto@gmail.com>"]
+
+[dependencies]
