@@ -2,6 +2,7 @@
 name = "bear"
 version = "3.0.0"
 authors = ["Laszlo Nagy <rizsotto@gmail.com>"]
+license = "MIT"
 
 [dependencies]
 serde = "0.9"
