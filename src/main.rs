@@ -5,10 +5,15 @@
 
 #[macro_use]
 extern crate clap;
+#[macro_use]
+extern crate serde_derive;
+extern crate serde_json;
 
 use std::env;
 use std::process;
 use clap::{App, Arg};
+
+mod parameters;
 
 fn main() {
     let default_cc_compiler = env::var("CC").unwrap_or("cc".to_string());
@@ -54,12 +59,19 @@ fn main() {
             .help("The build command to intercept"))
         .get_matches();
 
+    let config = parameters::Parameters {
+        cc: matches.value_of("cc_compiler").unwrap().to_string(),
+        cxx: matches.value_of("cxx_compiler").unwrap().to_string(),
+    };
     let build: Vec<_> = matches.values_of("build").unwrap().collect();
 
-    let command = process::Command::new(build[0])
-        .args(&build[1..])
-        .spawn();
-    match command {
+    let mut command = process::Command::new(build[0]);
+    command.args(&build[1..]);
+    parameters::write(config, &mut command);
+    command.env("CC", "bear-cc");
+    command.env("CXX", "bear-cxx");
+
+    match command.spawn() {
         Ok(mut child) => match child.wait() {
             Ok(status_code) => process::exit(status_code.code().unwrap_or(130)), // 128 + signal
             Err(_) => process::exit(64), // not used yet
