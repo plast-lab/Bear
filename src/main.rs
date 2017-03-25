@@ -63,11 +63,12 @@ fn main() {
         cc: matches.value_of("cc_compiler").unwrap().to_string(),
         cxx: matches.value_of("cxx_compiler").unwrap().to_string(),
     };
+    let (config_key, config_val) = config.to_env();
     let build: Vec<_> = matches.values_of("build").unwrap().collect();
 
     let mut command = process::Command::new(build[0]);
     command.args(&build[1..]);
-    parameters::write(config, &mut command);
+    command.env(config_key, config_val);
     command.env("CC", "bear-cc");
     command.env("CXX", "bear-cxx");
 
